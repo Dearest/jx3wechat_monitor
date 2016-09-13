@@ -15,14 +15,14 @@ namespace :monitor do
       if proxy.nil?
         response = HTTP.get(url, headers: {"User-Agent" => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36'})
       else
-        response = HTTP.via(proxy[0],proxy[1].to_i).get(url, headers: {"User-Agent" => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36'})
+        response = HTTP.via(proxy[0], proxy[1].to_i).get(url, headers: {"User-Agent" => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36'})
       end
       content = Nokogiri::HTML(response.to_s).css('div.wx-rb')[0].css('span.sp-txt')[2]
     rescue Exception => e
       puts e.message
       puts proxy
       Log.create(title: e.message, status: :unpass)
-      $redis.srem(:proxies,proxy.join(':'))
+      $redis.srem(:proxies, proxy.join(':'))
       return nil
     end
     title = content.children[0].text
@@ -31,14 +31,18 @@ namespace :monitor do
 
     if !PushLog.exists?(title: title)
       PushLog.create(title: title, url: url, time: time)
-      get_active_code(url) if title.include?('内藏福利')
+      get_active_code(url, title) if title.include?('内藏福利')
       Log.create(title: title, status: :passed)
     else
       Log.create(title: title, status: :unpass)
     end
   end
 
-  def get_active_code(url)
-
+  def get_active_code(url, title)
+    response = HTTParty.get(url, headers: {"User-Agent" => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36'})
+    content = Nokogiri::HTML(response).css('span[style="font-size: 14px;"]')
+    content.each do |node|
+      ActiveCode.create(title: title, code: node.text) if node.text.length == 19
+    end
   end
 end
