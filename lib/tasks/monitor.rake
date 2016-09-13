@@ -21,6 +21,8 @@ namespace :monitor do
     rescue Exception => e
       puts e.message
       puts proxy
+      Log.create(title: e.message, status: :unpass)
+      $redis.srem(:proxies,proxy.join(':'))
       return nil
     end
     title = content.children[0].text
