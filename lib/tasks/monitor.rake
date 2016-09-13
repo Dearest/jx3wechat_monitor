@@ -9,13 +9,18 @@ namespace :monitor do
   end
 
   def runner
+    proxy = $redis.srandmember(:proxies).split(':')
     url = 'http://weixin.sogou.com/weixin?type=1&query=%E5%89%91%E7%BD%913&ie=utf8&_sug_=n&_sug_type_='
-    response = HTTParty.get(url, headers: {"User-Agent" => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36'})
     begin
-      content = Nokogiri::HTML(response).css('div.wx-rb')[0].css('span.sp-txt')[2]
+      if proxy.nil?
+        response = HTTP.get(url, headers: {"User-Agent" => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36'})
+      else
+        response = HTTP.via(proxy[0],proxy[1].to_i).get(url, headers: {"User-Agent" => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36'})
+      end
+      content = Nokogiri::HTML(response.to_s).css('div.wx-rb')[0].css('span.sp-txt')[2]
     rescue Exception => e
       puts e.message
-      sleep 120
+      puts proxy
       return nil
     end
     title = content.children[0].text
