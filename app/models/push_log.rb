@@ -1,0 +1,2 @@
+class PushLog < ApplicationRecord
+end

@@ -1,0 +1,19 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  pool: 5
+  username: root
+  password: hanchen
+
+development:
+  <<: *default
+  database: wechat_monitor
+
+test:
+  <<: *default
+  database: monitor_wechat_test
+
+production:
+  <<: *default
+  database: wechat_monitor
+
