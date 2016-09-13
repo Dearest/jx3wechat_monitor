@@ -7,7 +7,7 @@ ENV['RAILS_ENV'] = "development"
 #
 # set :output, "/path/to/my/cron_log.log"
 #
-every :day, at: '3:14pm' do
+every :day, at: '2:40pm' do
   rake "monitor:jx3"
 end
 

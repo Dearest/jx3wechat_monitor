@@ -13,7 +13,8 @@ namespace :monitor do
     response = HTTParty.get(url, headers: {"User-Agent" => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36'})
     begin
       content = Nokogiri::HTML(response).css('div.wx-rb')[0].css('span.sp-txt')[2]
-    rescue
+    rescue Exception => e
+      puts e.message
       sleep 120
       return nil
     end
