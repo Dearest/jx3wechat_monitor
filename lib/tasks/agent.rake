@@ -9,7 +9,6 @@ namespace :agent do
     proxies = []
     (1..2).each do |page|
       proxies += get_url('nt', page) #国内透明
-      proxies += get_url('nn', page) #国内高匿
     end
     proxies
   end
@@ -28,7 +27,7 @@ namespace :agent do
 
   def check_proxy(ip, port)
     begin
-      HTTP.via(ip, port).timeout({connect: 6, read: 6}).get('http://www.baidu.com').code == 200
+      HTTP.via(ip, port).timeout({connect: 6, read: 6}).get('http://weixin.sogou.com/').code == 200
     rescue
       false
     end

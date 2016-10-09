@@ -4,7 +4,7 @@ namespace :monitor do
     total = 1*60*90
     (1..total).each do
       runner
-      sleep 28
+      sleep 5
     end
   end
 
@@ -25,6 +25,7 @@ namespace :monitor do
       $redis.srem(:proxies, proxy.join(':'))
       return nil
     end
+    puts '--------------------------- get response ----------------------'
     title = content.children[0].text
     url = content.css('a')[0]["href"]
     time = Time.at(content.children[1].text.split("'")[1].to_i).to_datetime
@@ -40,9 +41,11 @@ namespace :monitor do
 
   def get_active_code(url, title)
     response = HTTParty.get(url, headers: {"User-Agent" => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36'})
+    puts '--------------------get active code---------------------------------'
     content = Nokogiri::HTML(response).css('span[style="font-size: 14px;"]')
     content.each do |node|
-      ActiveCode.create(title: title, code: node.text) if node.text.length == 19
+      # ActiveCode.create(title: title, code: node.text) if node.text.length == 19
+       ActiveCode.create(title: title, code: node.text) if node.text.length == 16
     end
   end
 end
